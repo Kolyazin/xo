@@ -45,22 +45,29 @@ async def kbd(message: types.Message):
 
 @dp.message_handler(lambda message: message.text in steps)
 async def one(message: types.Message):
+    global buttons
+    global steps
     mess = 'Твой ход'
-    print(message)
     keyboard = types.ReplyKeyboardMarkup()
 
     # крестик   
     buttons[buttons.index(message.text)] = '\u274C'
-    print(message.text)
     steps.pop(steps.index(message.text))
 
-    if steps:
-        bot_step = random.choice(steps)
-        # нолик
-        buttons[buttons.index(bot_step)] = '\u2B55'
-        steps.remove(bot_step)
+    if not win(buttons=buttons):
+        if steps:
+            bot_step = random.choice(steps)
+            # нолик
+            buttons[buttons.index(bot_step)] = '\u2B55'
+            steps.remove(bot_step)
+            if win(buttons=buttons):
+                mess='Я выиграл\nКонец игры'
+                steps = []
+        else:
+            mess = 'Ничья\nКонец игры'
     else:
-        mess = 'Конец игры'
+        mess = 'Ты выиграл\nКонец игры'
+        steps = []
 
     keyboard.add(*buttons)
     await message.answer(mess, reply_markup=keyboard)
@@ -71,6 +78,27 @@ async def echo(message: types.Message):
     # old style:
     # await bot.send_message(message.chat.id, message.text)
     await message.answer(message.text)
+
+def win(buttons: buttons):
+    print(buttons)
+    if buttons[0] == buttons[1] and buttons[0] == buttons[2]:
+        return True
+    if buttons[3] == buttons[4] and buttons[3] == buttons[5]:
+        return True
+    if buttons[6] == buttons[7] and buttons[6] == buttons[8]:
+        return True
+    if buttons[0] == buttons[3] and buttons[0] == buttons[6]:
+        return True
+    if buttons[1] == buttons[4] and buttons[1] == buttons[7]:
+        return True
+    if buttons[2] == buttons[5] and buttons[2] == buttons[8]:
+        return True
+    if buttons[0] == buttons[4] and buttons[0] == buttons[8]:
+        return True
+    if buttons[2] == buttons[4] and buttons[2] == buttons[6]:
+        return True
+    return False
+
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
