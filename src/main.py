@@ -31,7 +31,6 @@ async def send_welcome(message: types.Message):
 
 buttons = []
 steps = []
-keyboard = types.ReplyKeyboardMarkup()
 
 @dp.message_handler(commands='xo')
 async def kbd(message: types.Message):
@@ -46,23 +45,23 @@ async def kbd(message: types.Message):
 
 @dp.message_handler(lambda message: message.text in steps)
 async def one(message: types.Message):
-    global steps
     mess = 'Твой ход'
     print(message)
     keyboard = types.ReplyKeyboardMarkup()
 
-    print(buttons)
-    print(steps)
+    # крестик   
     buttons[buttons.index(message.text)] = '\u274C'
     print(message.text)
     steps.pop(steps.index(message.text))
 
     if steps:
         bot_step = random.choice(steps)
+        # нолик
         buttons[buttons.index(bot_step)] = '\u2B55'
         steps.remove(bot_step)
     else:
         mess = 'Конец игры'
+
     keyboard.add(*buttons)
     await message.answer(mess, reply_markup=keyboard)
 
